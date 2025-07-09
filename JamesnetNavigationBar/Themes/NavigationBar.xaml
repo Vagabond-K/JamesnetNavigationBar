@@ -1,0 +1,170 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
+
+    <CubicEase x:Key="CubicEase" EasingMode="EaseInOut"/>
+
+    <Storyboard x:Key="Selected">
+        <ThicknessAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="icon" Storyboard.TargetProperty="Margin" Duration="0:0:0.5" To="0 -80 0 0"/>
+        <ThicknessAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="name" Storyboard.TargetProperty="Margin" Duration="0:0:0.5" To="0 45 0 0"/>
+        <DoubleAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="icon" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5" To="1"/>
+        <DoubleAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="name" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5" To="1"/>
+    </Storyboard>
+
+    <Storyboard x:Key="UnSelected">
+        <ThicknessAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="icon" Storyboard.TargetProperty="Margin" Duration="0:0:0.5" To="0 0 0 0"/>
+        <ThicknessAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="name" Storyboard.TargetProperty="Margin" Duration="0:0:0.5" To="0 60 0 0"/>
+        <DoubleAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="icon" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5" To="0.25"/>
+        <DoubleAnimation EasingFunction="{StaticResource CubicEase}" Storyboard.TargetName="name" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5" To="0"/>
+    </Storyboard>
+
+    <Style TargetType="{x:Type Path}" x:Key="Icon">
+        <Setter Property="Data" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem},Path=Tag}"/>
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Opacity" Value="0.25"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="Name">
+        <Setter Property="Text" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem},Path=Content}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Opacity" Value="0"/>
+        <Setter Property="Margin" Value="0 60 0 0"/>
+    </Style>
+
+    <Style TargetType="{x:Type ListBoxItem}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="Width" Value="80"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Grid Background="{TemplateBinding Background}" ClipToBounds="False" Margin="0,40,0,0">
+                        <Path x:Name="icon" Style="{StaticResource Icon}" Fill="{TemplateBinding Foreground}"/>
+                        <TextBlock x:Name="name" Style="{StaticResource Name}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource Selected}"/>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource UnSelected}"/>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ListBox}">
+        <Setter Property="Foreground" Value="CadetBlue"/>
+        <Setter Property="Background" Value="#DDDDDD"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBox}">
+                    <Grid Height="120" UseLayoutRounding="False" SnapsToDevicePixels="False">
+                        <i:Interaction.Triggers>
+                            <i:PropertyChangedTrigger Binding="{Binding SelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                                <i:ControlStoryboardAction>
+                                    <i:ControlStoryboardAction.Storyboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Translate" Storyboard.TargetProperty="X"
+                                                             To="{Binding SelectedIndex, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
+                                                             Duration="0:0:0.5">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuinticEase EasingMode="EaseInOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </i:ControlStoryboardAction.Storyboard>
+                                </i:ControlStoryboardAction>
+                            </i:PropertyChangedTrigger>
+                        </i:Interaction.Triggers>
+                        
+                        <Rectangle x:Name="Bar" Height="80" VerticalAlignment="Bottom">
+                            <i:Interaction.Triggers>
+                                <i:PropertyChangedTrigger Binding="{Binding ActualWidth, ElementName=Bar}">
+                                    <i:ChangePropertyAction TargetName="BarBorder" PropertyName="Rect" Value="{Binding RenderedGeometry.Bounds, ElementName=Bar}"/>
+                                </i:PropertyChangedTrigger>
+                            </i:Interaction.Triggers>
+                        </Rectangle>
+                        
+                        <Rectangle Fill="{TemplateBinding Background}" Height="80" VerticalAlignment="Bottom">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush>
+                                    <VisualBrush.Visual>
+                                        <Path Fill="White" Stroke="White" StrokeThickness="20" StrokeLineJoin="Round">
+                                            <Path.Data>
+                                                <CombinedGeometry GeometryCombineMode="Exclude">
+                                                    <CombinedGeometry.Geometry1>
+                                                        <CombinedGeometry GeometryCombineMode="Intersect">
+                                                            <CombinedGeometry.Geometry1>
+                                                                <RectangleGeometry x:Name="BarBorder" Rect="{Binding RenderedGeometry.Bounds, Mode=OneTime, ElementName=Bar}">
+                                                                    <RectangleGeometry.Transform>
+                                                                        <TranslateTransform X="-10" Y="-10"/>
+                                                                    </RectangleGeometry.Transform>
+                                                                </RectangleGeometry>
+                                                            </CombinedGeometry.Geometry1>
+                                                            <CombinedGeometry.Geometry2>
+                                                                <RectangleGeometry Rect="{Binding Rect, ElementName=BarBorder}">
+                                                                    <RectangleGeometry.Transform>
+                                                                        <TranslateTransform X="10" Y="10"/>
+                                                                    </RectangleGeometry.Transform>
+                                                                </RectangleGeometry>
+                                                            </CombinedGeometry.Geometry2>
+                                                        </CombinedGeometry>
+                                                    </CombinedGeometry.Geometry1>
+                                                    <CombinedGeometry.Geometry2>
+                                                        <EllipseGeometry RadiusX="0.635" RadiusY="0.635">
+                                                            <EllipseGeometry.Transform>
+                                                                <TransformGroup>
+                                                                    <TranslateTransform
+                                                                        x:Name="Translate"
+                                                                        X="{Binding SelectedIndex, Mode=OneTime, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
+                                                                    <ScaleTransform ScaleX="80" ScaleY="80"/>
+                                                                    <TranslateTransform X="60"/>
+                                                                </TransformGroup>
+                                                            </EllipseGeometry.Transform>
+                                                        </EllipseGeometry>
+                                                    </CombinedGeometry.Geometry2>
+                                                </CombinedGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                    </VisualBrush.Visual>
+                                </VisualBrush>
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+
+                        <Ellipse Fill="{TemplateBinding Foreground}" Width="0.85" Height="0.85" VerticalAlignment="Top" HorizontalAlignment="Left" UseLayoutRounding="False">
+                            <Ellipse.RenderTransform>
+                                <TransformGroup>
+                                    <TranslateTransform X="{Binding X, ElementName=Translate}"/>
+                                    <ScaleTransform ScaleX="80" ScaleY="80"/>
+                                    <TranslateTransform X="26" Y="6"/>
+                                </TransformGroup>
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                        
+                        <ItemsPresenter Margin="20 0"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
